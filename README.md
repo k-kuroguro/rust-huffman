@@ -1,0 +1,40 @@
+# Huffman
+
+Huffman coding written in Rust.
+
+# Install
+
+```bash
+cargo install --git https://github.com/k-kuroguro/rust-huffman
+```
+
+# Usage
+
+```bash
+$ huffman --help
+Encode/Decode text by huffman coding.
+
+Usage: huffman <COMMAND>
+
+Commands:
+  encode  Encode plane text
+  decode  Decode bit string
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help information
+```
+
+## Example
+
+```bash
+$ huffman encode "Hello World!"
+0000000000000000000000000010010100000000000000000000000000001100000000000000000000000000010110101010010001001000010101101100010010000010110111101011100101011001010101100100101010111000000001101010110110011111011100011110001
+```
+
+```bash
+$ huffman decode "00000000000000000000000000100101000000000000000000000000000011\
+00000000000000000000000000010110101010010001001000010101101100010010000010110111\
+101011100101011001010101100100101010111000000001101010110110011111011100011110001"
+Hello World!
+```

@@ -171,10 +171,11 @@ mod tests {
       let arg = Cli {
          command: Commands::Encode {
             plane: String::from(LOREM_IPSUM_PLANE),
+            verbose: Some(false),
          },
       };
       let expected_bits = String::from(LOREM_IPSUM_CODE);
-      assert_eq!(expected_bits, execute_command(arg).unwrap());
+      assert_eq!(expected_bits, execute_command(&arg).unwrap());
    }
 
    #[test]
@@ -182,10 +183,11 @@ mod tests {
       let arg = Cli {
          command: Commands::Decode {
             bit_string: String::from(LOREM_IPSUM_CODE),
+            verbose: Some(false),
          },
       };
       let expected_plane = String::from(LOREM_IPSUM_PLANE);
-      assert_eq!(expected_plane, execute_command(arg).unwrap());
+      assert_eq!(expected_plane, execute_command(&arg).unwrap());
    }
 
    #[test]
@@ -193,11 +195,12 @@ mod tests {
       let arg = Cli {
          command: Commands::Encode {
             plane: String::from("あいうえお🌳"),
+            verbose: Some(false),
          },
       };
       assert_eq!(
          CliError::InvalidPlaneText,
-         execute_command(arg).unwrap_err()
+         execute_command(&arg).unwrap_err()
       );
    }
 
@@ -206,11 +209,12 @@ mod tests {
       let arg = Cli {
          command: Commands::Decode {
             bit_string: String::from("1010105"),
+            verbose: Some(false),
          },
       };
       assert_eq!(
          CliError::InvalidBitString,
-         execute_command(arg).unwrap_err()
+         execute_command(&arg).unwrap_err()
       );
    }
 }

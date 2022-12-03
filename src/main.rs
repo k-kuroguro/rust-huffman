@@ -1,8 +1,8 @@
 mod code;
 
-use std::{error, fmt};
+use std::{error, fmt, time::Instant};
 
-use clap::{Parser, Subcommand};
+use clap::{ArgAction, Parser, Subcommand};
 use code::{decode, encode, Bits};
 
 #[derive(Debug, PartialEq)]
@@ -43,12 +43,16 @@ enum Commands {
    Encode {
       #[arg()]
       plane: String,
+      #[clap(short, long, action=ArgAction::SetTrue)]
+      verbose: Option<bool>,
    },
    /// Decode bit string.
    #[command()]
    Decode {
       #[arg()]
       bit_string: String,
+      #[clap(short, long, action=ArgAction::SetTrue)]
+      verbose: Option<bool>,
    },
 }
 
@@ -57,9 +61,10 @@ fn handle_error(error: CliError) -> CliError {
    error
 }
 
-fn execute_command(args: Cli) -> Result<String, CliError> {
-   Ok(match args.command {
-      Commands::Encode { plane } => {
+fn execute_command(args: &Cli) -> Result<String, CliError> {
+   Ok(match &args.command {
+      Commands::Encode { plane, verbose } => {
+         let start = Instant::now();
          if !plane.is_ascii() {
             return Err(handle_error(CliError::InvalidPlaneText));
          }
@@ -68,9 +73,22 @@ fn execute_command(args: Cli) -> Result<String, CliError> {
             .into_iter()
             .map(|x| if x { "1" } else { "0" })
             .collect();
+         let elapsed = start.elapsed();
+         if verbose.unwrap_or(false) {
+            return Ok("Elapsed Time: ".to_string()
+               + &elapsed.as_micros().to_string()
+               + " μs\nCompressibility: "
+               + &(100 * bits.len() / (8 * plane.as_bytes().len())).to_string()
+               + " %\nCode: "
+               + &bits.to_string());
+         }
          bits
       }
-      Commands::Decode { bit_string } => {
+      Commands::Decode {
+         bit_string,
+         verbose,
+      } => {
+         let start = Instant::now();
          let mut validated_bit_string = bit_string.chars().map(|x| match x {
             '1' => Ok(true),
             '0' => Ok(false),
@@ -85,6 +103,13 @@ fn execute_command(args: Cli) -> Result<String, CliError> {
             _ => unreachable!(),
          }));
          let plane = decode(&bits);
+         let elapsed = start.elapsed();
+         if verbose.unwrap_or(false) {
+            return Ok("Elapsed Time: ".to_string()
+               + &elapsed.as_micros().to_string()
+               + " μs\nPlain Text: "
+               + &plane.to_string());
+         }
          plane
       }
    })
@@ -92,7 +117,7 @@ fn execute_command(args: Cli) -> Result<String, CliError> {
 
 fn main() -> Result<(), CliError> {
    let args = Cli::parse();
-   match execute_command(args) {
+   match execute_command(&args) {
       Ok(x) => Ok(println!("{}", x)),
       Err(x) => Err(x),
    }

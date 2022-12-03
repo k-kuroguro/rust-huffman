@@ -1,6 +1,6 @@
 # Huffman
 
-Huffman coding written in Rust.
+Huffman coding encoder/decoder written in Rust.
 
 # Install
 
